@@ -3,6 +3,7 @@
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
 Version: 1.0
 License: GPLv2
+GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
 
 //add custom category metabox
