@@ -1,0 +1,30 @@
+#custom-category ul {
+    display:grid;
+    grid-template-columns: repeat(6, min-max(1fr, 80px));
+    grid-template-rows: 2;
+}
+#custom-category ul li {
+    margin: 0;
+    margin-right:0;
+    padding: 10px;
+}
+#custom-category ul li.parent {
+    order:99;
+}
+#custom-category ul li.parent.selected {
+    background-color: #eee;
+}
+#custom-category ul li.child {
+    order:99;
+    grid-row-start:2;
+    background-color: #eee;
+}
+#custom-category ul li.child.hidden {
+    visibility: hidden;
+}
+#custom-category label {
+    white-space: nowrap;
+}
+#custom-category #category-22 {
+    order:98;
+}
