@@ -8,29 +8,33 @@ jQuery(document).ready(function ($) {
 
     parentCatInput.change(function(e){
         target = $(e.target);
+        toggleCats(target);
+    })
+
+    target = $('li.parent input[type="checkbox"]:checked');
+    toggleCats(target);
+
+    function toggleCats(target) {
         val = target.val();
+        child = target.data('child');
+        console.log(child);
 
         parentCatInput.prop('checked', false);
         target.prop('checked', true);
         parentCatLi.removeClass('selected');
         target.parents('li').addClass('selected');
-        
-        checked = mediaCat.is(':checked');
-        toggleSubCats(checked);
-    })
 
-
-    toggleSubCats(mediaCat.is(':checked'));
-    // subCatInput.is('checked') ? subCatInput.parents('li').addClass('selected');
-
-    function toggleSubCats(checked){
-        console.log('triggered:', checked);
-        if(checked) {
-            subCatList.removeClass('hidden');
+        if (child.length) {
+            array = child.split(',');
+            children = $(array);
+            children.each(function () {
+                $('#category-' + this).removeClass('hidden');
+            })
         }
         else {
             subCatInput.prop('checked', false);
             subCatList.addClass('hidden');
         }
-    }
+    };
+   
 })
