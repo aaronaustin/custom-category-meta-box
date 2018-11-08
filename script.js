@@ -16,7 +16,7 @@ jQuery(document).ready(function ($) {
 
     function toggleCats(target) {
         val = target.val();
-        child = target.data('child');
+        child = target.data('child') || false;
         console.log(child);
 
         parentCatInput.prop('checked', false);
