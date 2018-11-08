@@ -24,7 +24,7 @@ jQuery(document).ready(function ($) {
         parentCatLi.removeClass('selected');
         target.parents('li').addClass('selected');
 
-        if (child.length) {
+        if (child) {
             array = child.split(',');
             children = $(array);
             children.each(function () {
