@@ -1,4 +1,4 @@
-#custom-category ul {
+/* #custom-category ul {
     display:grid;
     grid-template-columns: repeat(6, min-max(1fr, 80px));
     grid-template-rows: 2;
@@ -27,4 +27,4 @@
 }
 #custom-category #category-22 {
     order:98;
-}
+} */
