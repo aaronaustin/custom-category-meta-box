@@ -1,3 +1,16 @@
+#edit-slug-box {
+    display: none;
+}
+.input-group.inline {
+    display: flex;
+    justify-content: space-between;
+}
+.input-wrapper {
+    width: 100%;
+}
+.input-group.inline input {
+    width: calc(100% - 4px);
+}
 /* #custom-category ul {
     display:grid;
     grid-template-columns: repeat(6, min-max(1fr, 80px));

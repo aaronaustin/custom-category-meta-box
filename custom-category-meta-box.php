@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.0.6
+Version: 1.0.7
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -301,6 +301,361 @@ function display_taxonomy() {
 add_action( 'init', 'display_taxonomy', 0 );
 
 
+//event dates
+//Event meta box
+function event_add_meta_box() {
+//this will add the metabox for the event post type
+$screens = array( 'post' );
 
+foreach ( $screens as $screen ) {
+    add_meta_box(
+        'event_sectionid',
+        __( 'Event Details', 'event_textdomain' ),
+        'event_meta_box_callback',
+        $screen
+    );
+ }
+}
+add_action( 'add_meta_boxes', 'event_add_meta_box' );
+
+/**
+ * Prints the box content.
+ *
+ * @param WP_Post $post The object for the current post/page.
+ */
+function event_meta_box_callback( $post ) {
+
+// Add a nonce field so we can check for it later.
+wp_nonce_field( 'event_save_meta_box_data', 'event_meta_box_nonce' );
+
+/*
+ * Use get_post_meta() to retrieve an existing value
+ * from the database and use the value for the form.
+ */
+ // original for single retrieve.
+ //https://developer.wordpress.org/reference/functions/get_post_meta/
+// $value = get_post_meta( $post->ID, 'event_datetime', true );
+$event_meta = get_post_meta( $post->ID, false );
+
+echo '	<div class="input-group inline">
+			<div class="input-wrapper">
+				<label for="event_start_date">Start Date<span>*</span></label>
+				<input type="date" class="event_start" id="event_start_date" name="event_start_date" value="' . esc_attr( substr($event_meta['event_start_datetime'][0],0,10) ) . '" size="25" />
+			</div>
+			<div class="input-wrapper">
+				<label for="event_start_time">Start Time<span>*</span></label>
+				<input type="time" class="event_start" id="event_start_time" name="event_start_time" value="' . esc_attr( substr($event_meta['event_start_datetime'][0],11,15) ) . '" size="25" />
+			</div>
+		</div>
+
+		<div class="input-group inline">
+			<div class="input-wrapper">
+				<label for="event_end_date">End Date<span>*</span></label>
+				<input type="date" class="event_end" id="event_end_date" name="event_end_date" value="' . esc_attr( substr($event_meta['event_end_datetime'][0],0,10) ) . '" size="25" />
+			</div>
+			<div class="input-wrapper">
+				<label for="event_end_time">End Time<span>*</span></label>
+				<input type="time" class="event_end" id="event_end_time" name="event_end_time" value="' . esc_attr( substr($event_meta['event_end_datetime'][0],11,15) ) . '" size="25" />
+			</div>
+		</div>
+
+
+		<input type="hidden" id="event_start_datetime" name="event_start_datetime" value="' . esc_attr( $event_meta['event_start_datetime'][0] ) . '" size="25" />
+		<input type="hidden" id="event_monthday" name="event_monthday" value="' . esc_attr( $event_meta['event_monthday'][0] ) . '" size="25" />
+		<input type="hidden" id="event_end_datetime" name="event_end_datetime" value="' . esc_attr( $event_meta['event_end_datetime'][0] ) . '" size="25" />';
+}
+
+/**
+ * When the post is saved, saves our custom data.
+ *
+ * @param int $post_id The ID of the post being saved.
+ */
+ function event_save_meta_box_data( $post_id ) {
+
+ if ( ! isset( $_POST['event_meta_box_nonce'] ) ) {
+    return;
+ }
+
+ if ( ! wp_verify_nonce( $_POST['event_meta_box_nonce'], 'event_save_meta_box_data' ) ) {
+    return;
+ }
+
+ if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+    return;
+ }
+
+ // Check the user's permissions.
+ if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {
+
+    if ( ! current_user_can( 'edit_page', $post_id ) ) {
+        return;
+    }
+
+ } else {
+
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+ }
+
+ if ( ! isset( $_POST['event_start_datetime'] ) || 
+		 ! isset( $_POST['event_end_datetime'] ) 
+ ) {
+    return;
+ }
+
+ $event_start_datetime_data = sanitize_text_field( $_POST['event_start_datetime'] );
+ $event_end_datetime_data = sanitize_text_field( $_POST['event_end_datetime'] );
+ $event_monthday_data = sanitize_text_field( $_POST['event_monthday'] );
+
+ $event_data = array(
+	 array(
+		 'name' => 'event_start_datetime',
+		 'value' => $event_start_datetime_data
+	 ),
+	 array(
+		 'name' => 'event_end_datetime',
+		 'value' => $event_end_datetime_data
+	 ),
+	 array(
+		 'name' => 'event_monthday',
+		 'value' => $event_monthday_data
+	 )
+
+	 );
+//  var_dump($event_start_datetime_data);
+ update_event_meta( $post_id, $event_data );
+
+
+}
+function update_event_meta($post, $data_array) {
+	foreach ($data_array as $field) {
+		update_post_meta($post, $field['name'], $field['value']);
+	}
+}
+add_action( 'save_post', 'event_save_meta_box_data' );
+
+
+//add custom Meta to API endpoint
+//https://developer.wordpress.org/reference/functions/register_rest_field/
+add_action( 'rest_api_init', 'create_event_api_posts_meta_field' );
+
+function create_event_api_posts_meta_field() {
+    // register_rest_field ( 'name-of-post-type', 'name-of-field-to-return', array-of-callbacks-and-schema() );
+    register_rest_field( 'post', 'event_date', array(
+           'get_callback'    => 'get_event_post_meta_for_api',
+           'schema'          => null,
+        )
+    );
+}
+
+function get_event_post_meta_for_api( $object ) {
+    //get the id of the post object array
+	$post_id = $object['id'];
+	//return the post meta
+	$event_start_datetime = get_post_meta( $post_id, 'event_start_datetime', true );
+	$event_end_datetime = get_post_meta( $post_id, 'event_end_datetime', true );
+	$event_monthday = get_post_meta( $post_id, 'event_monthday', true );
+	$event_post_meta = array(
+		'event_start_datetime' => $event_start_datetime,
+		'event_end_datetime' => $event_end_datetime,
+		'event_monthday' => $event_monthday
+	);
+	// var_dump($event_post_meta);
+    return $event_post_meta;
+}
+
+
+
+//path
+//Path meta box
+function path_add_meta_box() {
+//this will add the metabox for the path post type
+$screens = array( 'post');
+
+foreach ( $screens as $screen ) {
+    add_meta_box(
+        'path_sectionid',
+        __( 'Path Details', 'path_textdomain' ),
+        'path_meta_box_callback',
+		'post',
+		'normal',
+		'high'
+    );
+ }
+}
+add_action( 'add_meta_boxes', 'path_add_meta_box' );
+
+/**
+ * Prints the box content.
+ *
+ * @param WP_Post $post The object for the current post/page.
+ */
+function path_meta_box_callback( $post ) {
+
+// Add a nonce field so we can check for it later.
+wp_nonce_field( 'path_save_meta_box_data', 'path_meta_box_nonce' );
+
+/*
+ * Use get_post_meta() to retrieve an existing value
+ * from the database and use the value for the form.
+ */
+ // original for single retrieve.
+ //https://developer.wordpress.org/reference/functions/get_post_meta/
+// $value = get_post_meta( $post->ID, 'path_custom', true );
+$path_meta = get_post_meta( $post->ID, false );
+
+echo '	<div class="input-group half">
+			<label for="path_custom">Path</label>
+			<input type="text" disabled class="path_custom" id="path_custom" name="path_custom" value="' . $path_meta['path_custom'][0] . '" />
+		</div>';
+}
+
+/**
+ * When the post is saved, saves our custom data.
+ *
+ * @param int $post_id The ID of the post being saved.
+ */
+ function path_save_meta_box_data( $post_id ) {
+
+ if ( ! isset( $_POST['path_meta_box_nonce'] ) ) {
+    return;
+ }
+
+ if ( ! wp_verify_nonce( $_POST['path_meta_box_nonce'], 'path_save_meta_box_data' ) ) {
+    return;
+ }
+
+ if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+    return;
+ }
+
+ // Check the user's permissions.
+ if ( isset( $_POST['post_type'] ) && 'page' == $_POST['post_type'] ) {
+
+    if ( ! current_user_can( 'edit_page', $post_id ) ) {
+        return;
+    }
+
+ } else {
+
+    if ( ! current_user_can( 'edit_post', $post_id ) ) {
+        return;
+    }
+ }
+
+ if ( ! isset( $_POST['path_custom'] ) ) 
+ {
+    return;
+ }
+
+ $path_custom_data = sanitize_text_field( $_POST['path_custom'] );
+
+ $path_data = array(
+	 array(
+		 'name' => 'path_custom',
+		 'value' => $path_custom_data
+	 )
+	 );
+//  var_dump($path_custom_data);
+ update_path_meta( $post_id, $path_data );
+
+
+}
+function update_path_meta($post, $data_array) {
+	foreach ($data_array as $field) {
+		update_post_meta($post, $field['name'], $field['value']);
+	}
+}
+add_action( 'save_post', 'path_save_meta_box_data' );
+
+
+//add custom Meta to API endpoint
+//https://developer.wordpress.org/reference/functions/register_rest_field/
+add_action( 'rest_api_init', 'create_path_api_posts_meta_field' );
+
+function create_path_api_posts_meta_field() {
+    // register_rest_field ( 'name-of-post-type', 'name-of-field-to-return', array-of-callbacks-and-schema() );
+    register_rest_field( 'post', 'path', array(
+           'get_callback'    => 'get_path_post_meta_for_api',
+           'schema'          => null,
+        )
+    );
+}
+
+function get_path_post_meta_for_api( $object ) {
+    //get the id of the post object array
+	$post_id = $object['id'];
+	//return the post meta
+	$path_custom = get_post_meta( $post_id, 'path_custom', true );
+	$path_post_meta = array(
+		'path_custom' => $path_custom,
+	);
+	// var_dump($path_post_meta);
+    return $path_post_meta;
+}
+
+//save path depending on whether or not the post is in the event category
+function my_update_value($post_id) {
+  $category_array = array();
+  $category_array = $_POST['post_category'];
+  $event_category = get_category_by_slug('event');
+  $start_date = get_post_meta( $post_id, 'event_start_datetime', true );
+
+  $isEvent = in_array((string)$event_category->term_id, $category_array,  true);
+  $title = sanitize_title($_POST['post_title']);
+
+  //if in the event category - use the acf start_date field to set path.  Otherwise, grab date from the post date values.
+  $date = $isEvent ? date('Y/m/d/', strtotime($start_date)) : $_POST['aa'] .'/'. $_POST['mm'] .'/'. $_POST['jj'] .'/';
+  $value = $date . $title;
+
+  update_post_meta($post_id, 'path_custom', $value);
+    
+}
+
+// acf/update_value/name={$field_name} - filter for a specific field based on it's name
+add_filter('save_post', 'my_update_value', 20);
+
+add_action( 'edit_form_after_title', 'add_content_before_editor' );
+
+function add_content_before_editor($post) {
+	$path_custom = get_post_meta( $post->ID, 'path_custom', true );
+	$path_link = 'http://lexcentral.com/'.$path_custom;
+    echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
+}
+
+
+/**
+ * vpm_default_hidden_meta_boxes
+ */
+function vpm_default_hidden_meta_boxes( $hidden, $screen ) {
+	// Grab the current post type
+	$post_type = $screen->post_type;
+	// If we're on a 'post'...
+	if ( $post_type == 'post' ) {
+		// Define which meta boxes we wish to hide
+		$hidden = array(
+			'authordiv',
+			'revisionsdiv',
+			'postexcerpt',
+			'commentsdiv',
+			'trackbacksdiv',
+			'commentstatusdiv',
+			'path_sectionid',
+			'slugdiv',
+			'formatdiv',
+			'edit-slug-box'
+
+		);
+		// Pass our new defaults onto WordPress
+		return $hidden;
+	}
+	// If we are not on a 'post', pass the
+	// original defaults, as defined by WordPress
+	return $hidden;
+		// remove_meta_box( 'revisionsdiv' , 'post' , 'normal' );      //removes comments
+
+}
+add_action( 'default_hidden_meta_boxes', 'vpm_default_hidden_meta_boxes', 10, 2 );
 
 ?>
