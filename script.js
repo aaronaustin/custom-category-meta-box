@@ -88,9 +88,29 @@ jQuery(document).ready(function ($) {
             // eventNull = isEventValueNull('#event_end_date');
         }
     }
-
     function isEventValueNull(target){
         return $(target).val() ? false : true;
+    }
+
+    var eventDefaultLocation = {
+       'location' : 'Central Baptist Church',
+       'address' : '110 Wilson Downing Rd.',
+       'city' : 'Lexington',
+       'state' : 'KY',
+       'zip' : '40517',
+    };
+
+    $('#setDefault').click(function(e){
+        e.preventDefault();
+        setDefaultLocation();
+    })
+
+    function setDefaultLocation() {
+        $('#event_location').val(eventDefaultLocation.location);
+        $('#event_address').val(eventDefaultLocation.address);
+        $('#event_city').val(eventDefaultLocation.city);
+        $('#event_state').val(eventDefaultLocation.state);
+        $('#event_zip').val(eventDefaultLocation.zip);
     }
    
 })

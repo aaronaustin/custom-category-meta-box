@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.0.7
+Version: 1.0.8
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -358,6 +358,35 @@ echo '	<div class="input-group inline">
 				<input type="time" class="event_end" id="event_end_time" name="event_end_time" value="' . esc_attr( substr($event_meta['event_end_datetime'][0],11,15) ) . '" size="25" />
 			</div>
 		</div>
+		<hr>
+		<div class="input-group inline">
+			<div class="input-wrapper">
+				<label for="event_location">Event Location<span>*</span></label>
+				<input type="text" id="event_location" name="event_location" value="' . esc_attr( $event_meta['event_location'][0] ) . '" size="25" />
+			</div>
+			<button id="setDefault" class="button">Default</button>
+		</div>
+		<div class="input-group inline">
+			<div class="input-wrapper">
+				<label for="event_address">Address<span>*</span></label>
+				<input type="text" id="event_address" name="event_address" value="' . esc_attr( $event_meta['event_address'][0] ) . '" size="25" />
+			</div>
+		</div>
+		<div class="input-group inline">
+			<div class="input-wrapper">
+				<label for="event_address">City<span>*</span></label>
+				<input type="text" id="event_city" name="event_city" value="' . esc_attr( $event_meta['event_city'][0] ) . '" size="25" />
+			</div>
+			<div class="input-wrapper">
+				<label for="event_address">State<span>*</span></label>
+				<input type="text" id="event_state" name="event_state" value="' . esc_attr( $event_meta['event_state'][0] ) . '" size="25" />
+			</div>
+			<div class="input-wrapper">
+				<label for="event_address">Zip<span>*</span></label>
+				<input type="text" id="event_zip" name="event_zip" value="' . esc_attr( $event_meta['event_zip'][0] ) . '" size="25" />
+			</div>
+		</div>
+
 
 
 		<input type="hidden" id="event_start_datetime" name="event_start_datetime" value="' . esc_attr( $event_meta['event_start_datetime'][0] ) . '" size="25" />
@@ -398,15 +427,27 @@ echo '	<div class="input-group inline">
     }
  }
 
- if ( ! isset( $_POST['event_start_datetime'] ) || 
-		 ! isset( $_POST['event_end_datetime'] ) 
- ) {
+ if ( 
+	! isset($_POST['event_start_datetime']) || 
+	! isset( $_POST['event_end_datetime']) ||
+	! isset( $_POST['event_location']) ||
+	! isset( $_POST['event_address']) ||
+	! isset( $_POST['event_city']) ||
+	! isset( $_POST['event_state']) ||
+	! isset( $_POST['event_zip'])
+ ) 
+ {
     return;
  }
 
  $event_start_datetime_data = sanitize_text_field( $_POST['event_start_datetime'] );
  $event_end_datetime_data = sanitize_text_field( $_POST['event_end_datetime'] );
  $event_monthday_data = sanitize_text_field( $_POST['event_monthday'] );
+ $event_location_data = sanitize_text_field( $_POST['event_location'] );
+ $event_address_data = sanitize_text_field( $_POST['event_address'] );
+ $event_city_data = sanitize_text_field( $_POST['event_city'] );
+ $event_state_data = sanitize_text_field( $_POST['event_state'] );
+ $event_zip_data = sanitize_text_field( $_POST['event_zip'] );
 
  $event_data = array(
 	 array(
@@ -420,7 +461,27 @@ echo '	<div class="input-group inline">
 	 array(
 		 'name' => 'event_monthday',
 		 'value' => $event_monthday_data
-	 )
+	 ),
+	 array(
+		 'name' => 'event_location',
+		 'value' => $event_location_data
+	 ),
+	 array(
+		 'name' => 'event_address',
+		 'value' => $event_address_data
+	 ),
+	 array(
+		 'name' => 'event_city',
+		 'value' => $event_city_data
+	 ),
+	 array(
+		 'name' => 'event_state',
+		 'value' => $event_state_data
+	 ),
+	 array(
+		 'name' => 'event_zip',
+		 'value' => $event_zip_data
+	 ),
 
 	 );
 //  var_dump($event_start_datetime_data);
@@ -442,7 +503,7 @@ add_action( 'rest_api_init', 'create_event_api_posts_meta_field' );
 
 function create_event_api_posts_meta_field() {
     // register_rest_field ( 'name-of-post-type', 'name-of-field-to-return', array-of-callbacks-and-schema() );
-    register_rest_field( 'post', 'event_date', array(
+    register_rest_field( 'post', 'event_details', array(
            'get_callback'    => 'get_event_post_meta_for_api',
            'schema'          => null,
         )
@@ -456,10 +517,21 @@ function get_event_post_meta_for_api( $object ) {
 	$event_start_datetime = get_post_meta( $post_id, 'event_start_datetime', true );
 	$event_end_datetime = get_post_meta( $post_id, 'event_end_datetime', true );
 	$event_monthday = get_post_meta( $post_id, 'event_monthday', true );
+	$event_location = get_post_meta( $post_id, 'event_location', true );
+	$event_address = get_post_meta( $post_id, 'event_address', true );
+	$event_city = get_post_meta( $post_id, 'event_city', true );
+	$event_state = get_post_meta( $post_id, 'event_state', true );
+	$event_zip = get_post_meta( $post_id, 'event_zip', true );
+
 	$event_post_meta = array(
 		'event_start_datetime' => $event_start_datetime,
 		'event_end_datetime' => $event_end_datetime,
-		'event_monthday' => $event_monthday
+		'event_monthday' => $event_monthday,
+		'event_location' => $event_location,
+		'event_address' => $event_address,
+		'event_city' => $event_city,
+		'event_state' => $event_state,
+		'event_zip' => $event_zip,
 	);
 	// var_dump($event_post_meta);
     return $event_post_meta;
