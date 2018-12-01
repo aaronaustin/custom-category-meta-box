@@ -698,6 +698,11 @@ function add_content_before_editor($post) {
 		$path_link = $front_base_url.'/'.$path_custom;
 		echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
 	}
+	elseif($current_screen->post_type === 'page') {
+		$path_custom = $post->post_name;
+		$path_link = $front_base_url.'/'.$path_custom;
+		echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
+	}
 	else {
 		$path_link = get_permalink($post->ID);
 		echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
