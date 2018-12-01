@@ -13,21 +13,23 @@ jQuery(document).ready(function ($) {
         targetInputs('media')
     );
     toggleCats(
+        triggerCat('worship').prop('checked'), 
+        taxDiv('media'), 
+        targetInputs('media')
+    );
+    toggleCats(
         triggerCat('slide').prop('checked'),
         taxDiv('slide'), 
         targetInputs('slide')
     );
     
-    toggleMetaBox(triggerCat('event').prop('checked'), 'event_sectionid');
-
+    toggleMetaBox(triggerCat('event').prop('checked') || triggerCat('worship').prop('checked'), 'event_sectionid');
+ 
     catInputs.change(function(e){
         target = $(e.target);
-        toggleCats(isInCat(target, 'media'), taxDiv('media'), targetInputs('media'));
-        toggleMetaBox(isInCat(target, 'event'), 'event_sectionid');
-    })
-    catInputs.change(function(e){
-        target = $(e.target);
+        toggleCats(isInCat(target, ['media', 'worship']), taxDiv('media'), targetInputs('media'));
         toggleCats(isInCat(target, 'slide'), taxDiv('slide'), targetInputs('slide'));
+        toggleMetaBox(isInCat(target, ['event', 'worship']), 'event_sectionid');
     })
 
     function triggerCat(slug) {
@@ -40,32 +42,35 @@ jQuery(document).ready(function ($) {
         return $('input[name="tax_input[' + slug + '][]"]');
     }
     function isInCat(element, slug) {
-        return element.data('catslug') === slug;
+        if (typeof slug === 'object'){            
+            return slug.indexOf(element.data('catslug')) !== -1 ? true : false;
+        }
+        else {
+            return element.data('catslug') === slug;
+        }
     }
     function toggleCats(isInCat, taxonomy, inputs) {
         if(isInCat) {
-            taxonomy.removeClass('hidden');
+            taxonomy.show();
         }
         else {
-            taxonomy.addClass('hidden');
-            inputs.prop('checked', false);
+            taxonomy.hide();
+            // inputs.prop('checked', false);
         }
     }
     function toggleMetaBox(isInCat, divId) {
         console.log('toggle meta:', divId)
         if(isInCat) {
-            $('#' + divId).removeClass('hidden');
+            $('#' + divId).show();
         }
         else {
-            $('#' + divId).addClass('hidden');
+            $('#' + divId).hide();
         }
     }
 
 
-    //event data
-    
+    //EVENT DATA
     var eventNull = isEventValueNull('#event_start_date');
-
 
     $(".event_start").change(function(){
         eventCompDate('#event_start_date', '#event_start_time', '#event_start_datetime');
@@ -77,16 +82,28 @@ jQuery(document).ready(function ($) {
     });
 
     function eventCompDate(date, time, target) {
-        console.log(date);
         var sDate = $(date).val();
         var sTime = $(time).val();
-        $(target).val(sDate + "T" + sTime);
         
-        if(date == '#event_start_date' && eventNull) {
+        if(date == '#event_start_date') {
             console.log(sDate)
-            $('#event_end_date').val(sDate);
-            // eventNull = isEventValueNull('#event_end_date');
+            $('#event_end_date').attr('value', sDate);
+            if(!sTime) {
+                $('#event_start_time').attr('value','18:00');
+                $('#event_end_time').attr('value','19:00');
+            }
+            else {        
+                var newhours = (Number(sTime.substring(0,2)) + 1) + sTime.substring(2,5);
+                console.log(newhours)
+                $('#event_end_time').attr('value',newhours);
+            }
         }
+        sDate = $('#event_start_date').val();
+        sTime = $('#event_start_time').val();
+        eDate = $('#event_end_date').val();
+        eTime = $('#event_end_time').val();
+        $('#event_start_datetime').attr('value', sDate + "T" + sTime);
+        $('#event_end_datetime').attr('value', eDate + "T" + eTime);
     }
     function isEventValueNull(target){
         return $(target).val() ? false : true;
@@ -99,6 +116,7 @@ jQuery(document).ready(function ($) {
        'state' : 'KY',
        'zip' : '40517',
     };
+
 
     $('#setDefault').click(function(e){
         e.preventDefault();

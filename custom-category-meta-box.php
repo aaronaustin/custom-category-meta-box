@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.0.8
+Version: 1.0.9
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -366,24 +366,23 @@ echo '	<div class="input-group inline">
 			</div>
 			<button id="setDefault" class="button">Default</button>
 		</div>
+	
 		<div class="input-group inline">
 			<div class="input-wrapper">
 				<label for="event_address">Address<span>*</span></label>
 				<input type="text" id="event_address" name="event_address" value="' . esc_attr( $event_meta['event_address'][0] ) . '" size="25" />
 			</div>
-		</div>
-		<div class="input-group inline">
-			<div class="input-wrapper">
-				<label for="event_address">City<span>*</span></label>
+			<div class="input-wrapper" style="width: 300px">
+				<label for="event_city">City<span>*</span></label>
 				<input type="text" id="event_city" name="event_city" value="' . esc_attr( $event_meta['event_city'][0] ) . '" size="25" />
 			</div>
-			<div class="input-wrapper">
-				<label for="event_address">State<span>*</span></label>
-				<input type="text" id="event_state" name="event_state" value="' . esc_attr( $event_meta['event_state'][0] ) . '" size="25" />
+			<div class="input-wrapper" style="width: 100px">
+				<label for="event_state">State<span>*</span></label>
+				<input type="text" id="event_state" maxlength="2" pattern="[A-Z]{2}" name="event_state" value="' . esc_attr( $event_meta['event_state'][0] ) . '" size="5" />
 			</div>
-			<div class="input-wrapper">
-				<label for="event_address">Zip<span>*</span></label>
-				<input type="text" id="event_zip" name="event_zip" value="' . esc_attr( $event_meta['event_zip'][0] ) . '" size="25" />
+			<div class="input-wrapper" style="width: 100px">
+				<label for="event_zip">Zip<span>*</span></label>
+				<input type="text" maxlength="5" pattern="[0-9]{5}" id="event_zip" name="event_zip" value="' . esc_attr( $event_meta['event_zip'][0] ) . '" size="10" />
 			</div>
 		</div>
 
@@ -544,7 +543,6 @@ function get_event_post_meta_for_api( $object ) {
 function path_add_meta_box() {
 //this will add the metabox for the path post type
 $screens = array( 'post');
-
 foreach ( $screens as $screen ) {
     add_meta_box(
         'path_sectionid',
@@ -672,9 +670,10 @@ function my_update_value($post_id) {
   $category_array = array();
   $category_array = $_POST['post_category'];
   $event_category = get_category_by_slug('event');
+  $worship_category = get_category_by_slug('worship');
   $start_date = get_post_meta( $post_id, 'event_start_datetime', true );
 
-  $isEvent = in_array((string)$event_category->term_id, $category_array,  true);
+  $isEvent = in_array((string)$event_category->term_id, $category_array,  true) || in_array((string)$worship_category->term_id, $category_array,  true);
   $title = sanitize_title($_POST['post_title']);
 
   //if in the event category - use the acf start_date field to set path.  Otherwise, grab date from the post date values.
@@ -691,9 +690,18 @@ add_filter('save_post', 'my_update_value', 20);
 add_action( 'edit_form_after_title', 'add_content_before_editor' );
 
 function add_content_before_editor($post) {
-	$path_custom = get_post_meta( $post->ID, 'path_custom', true );
-	$path_link = 'http://lexcentral.com/'.$path_custom;
-    echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
+	$current_screen = get_current_screen();
+	$front_base_url = get_field('front_URL', 'option');
+	// var_dump($current_screen->post_type);
+	if($current_screen->post_type === 'post') {
+		$path_custom = get_post_meta( $post->ID, 'path_custom', true );
+		$path_link = $front_base_url.'/'.$path_custom;
+		echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
+	}
+	else {
+		$path_link = get_permalink($post->ID);
+		echo '<strong>Path: </strong><a href="'.$path_link.'" target="_blank">'.$path_link.'</a>';
+	}
 }
 
 
@@ -729,5 +737,37 @@ function vpm_default_hidden_meta_boxes( $hidden, $screen ) {
 
 }
 add_action( 'default_hidden_meta_boxes', 'vpm_default_hidden_meta_boxes', 10, 2 );
+
+function remove_add_image_sizes() {
+	foreach ( get_intermediate_image_sizes() as $size ) {
+		if ( !in_array( $size, array( 'thumbnail' ) ) ) {
+			remove_image_size( $size );
+        }
+    }
+    add_image_size( 'large', 1920, 1080, true ); //force crop on photos.
+}
+add_action( 'after_setup_theme', 'remove_add_image_sizes' );
+
+function remove_post_excerpt_checkbox() {
+  ?>
+    <style>
+      .metabox-prefs label[for="media_category_div-hide"], 
+	  .metabox-prefs label[for="slide_category_div-hide"], 
+	  .metabox-prefs label[for="displaydiv-hide"], 
+	  .metabox-prefs label[for="commentsdiv-hide"], 
+	  .metabox-prefs label[for="slugdiv-hide"], 
+	  .metabox-prefs label[for="formatdiv-hide"], 
+	  .metabox-prefs label[for="postimagediv-hide"], 
+	  .metabox-prefs label[for="commentstatusdiv-hide"], 
+	  .metabox-prefs label[for="trackbacksdiv-hide"], 
+	  .metabox-prefs label[for="event_sectionid-hide"], 
+	  .metabox-prefs label[for="custom_category_div-hide"] 
+	  { 
+        display: none; 
+      }
+    </style>
+  <?php
+}
+add_action( 'admin_head', 'remove_post_excerpt_checkbox' );
 
 ?>
