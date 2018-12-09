@@ -4,7 +4,7 @@
     
     function my_register_route() {
                 
-            register_rest_route( 'wp/v2', 'this-sunday', array(
+            register_rest_route( 'aad/v2', 'sunday', array(
                     'methods' => 'GET',
                     'callback' => 'this_sunday',
                 )
