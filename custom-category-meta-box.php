@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.2.0
+Version: 1.2.1
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
