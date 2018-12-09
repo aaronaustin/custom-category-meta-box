@@ -53,7 +53,7 @@
             $path_custom = get_post_meta($posts->ID, 'path_custom', true); 
             
             $post_item = array(
-                'wordpress_id' => $idx,
+                'ID' => $post_id,
                 'title' => $post_title,
                 'event_start_datetime' => $event_start_datetime,
                 'path_custom' => $path_custom
@@ -68,7 +68,7 @@
         }
         wp_reset_postdata();
                 
-        return rest_ensure_response( $sunday_posts );
+        return rest_ensure_response( $post_data );
     }
         
 ?>
