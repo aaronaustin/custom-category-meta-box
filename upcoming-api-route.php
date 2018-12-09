@@ -68,7 +68,7 @@
         }
         wp_reset_postdata();
                 
-        return rest_ensure_response( $post_data );
+        return rest_ensure_response( $sunday_posts );
     }
         
 ?>
