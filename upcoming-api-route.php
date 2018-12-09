@@ -53,7 +53,7 @@
             $path_custom = get_post_meta($posts->ID, 'path_custom', true); 
             
             $post_item = array(
-                'wordpress_id' => 1,
+                'wordpress_id' => $idx,
                 'title' => $post_title,
                 'event_start_datetime' => $event_start_datetime,
                 'path_custom' => $path_custom
