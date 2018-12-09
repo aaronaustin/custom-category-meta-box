@@ -51,6 +51,7 @@
             $event_start_datetime = get_post_meta($posts->ID, 'event_start_datetime'); 
             $path_custom = get_post_meta($posts->ID, 'path_custom'); 
             
+            $post_data[ $post_id ][ 'wordpress_id' ] = $post_id;
             $post_data[ $post_id ][ 'title' ] = $post_title;
             $post_data[ $post_id ][ 'event_start_datetime' ] = $event_start_datetime;
             $post_data[ $post_id ][ 'path_custom' ] = $path_custom;
