@@ -52,10 +52,10 @@
             $path_custom = get_post_meta($posts->ID, 'path_custom', true); 
             
             $post_data[ 'wordpress_id' ] = 1;
-            $post_data[ $post_id ][ 'wordpress_id' ] = $post_id;
-            $post_data[ $post_id ][ 'title' ] = $post_title;
-            $post_data[ $post_id ][ 'event_start_datetime' ] = $event_start_datetime;
-            $post_data[ $post_id ][ 'path_custom' ] = $path_custom;
+            // $post_data[ 'wordpress_id' ] = $post_id;
+            $post_data[ 'title' ] = $post_title;
+            $post_data[ 'event_start_datetime' ] = $event_start_datetime;
+            $post_data[ 'path_custom' ] = $path_custom;
         }
         wp_reset_postdata();
                 
