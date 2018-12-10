@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.2.7
+Version: 1.2.8
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -575,7 +575,7 @@ wp_nonce_field( 'path_save_meta_box_data', 'path_meta_box_nonce' );
 // $value = get_post_meta( $post->ID, 'path_custom', true );
 $path_meta = get_post_meta( $post->ID, false );
 
-echo '	<div class="input-group half">
+echo '	<div class="input-group">
 			<label for="path_custom">Path</label>
 			<input type="text" disabled class="path_custom" id="path_custom" name="path_custom" value="' . $path_meta['path_custom'][0] . '" />
 		</div>';
@@ -672,9 +672,9 @@ function my_update_value($post_id) {
   $event_category = get_category_by_slug('event');
   $worship_category = get_category_by_slug('worship');
   $start_date = get_post_meta( $post_id, 'event_start_datetime', true );
+  $title = sanitize_title(get_the_title($post_id));
 
   $isEvent = in_array((string)$event_category->term_id, $category_array,  true) || in_array((string)$worship_category->term_id, $category_array,  true);
-  $title = sanitize_title($_POST['post_title']);
 
   //if in the event category - use the acf start_date field to set path.  Otherwise, grab date from the post date values.
   $date = $isEvent ? date('Y/m/d/', strtotime($start_date)) : $_POST['aa'] .'/'. $_POST['mm'] .'/'. $_POST['jj'] .'/';
@@ -684,7 +684,6 @@ function my_update_value($post_id) {
     
 }
 
-// acf/update_value/name={$field_name} - filter for a specific field based on it's name
 add_filter('save_post', 'my_update_value', 20);
 
 add_action( 'edit_form_after_title', 'add_content_before_editor' );
