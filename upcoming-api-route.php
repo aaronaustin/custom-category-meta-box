@@ -20,14 +20,15 @@
         // if( isset( $data[ 'id' ] ) ) {
         //     $post_author = $data[ 'id' ];
         // }
-        $next_sunday_date = date('Y-m-d',strtotime('this sunday'));
-            // var_dump($next_sunday_date);
+        $today = current_time( 'mysql' );
+        $this_sunday_date = date('Y-m-d',strtotime($today.'this sunday'));
+        
         $sunday_args = array(
             'offset'           => 0,
             'meta_query' => array(
                 'date_clause' => array(
                     array('key' => 'event_start_datetime',
-                            'value' => $next_sunday_date,
+                            'value' => $this_sunday_date,
                             'compare' => 'LIKE'
                     )
                 )
@@ -43,9 +44,11 @@
 
         // get the posts
         // $posts_list = get_posts( array( 'type' => 'post', 'category_slug' => 'worship' ) );
-        $post_data = array();
+        $post_data = array(
+            array('date' => $this_sunday_date)
+        );
         
-        $idx=0;
+        $idx=1;
         foreach( $sunday_posts as $posts) {
             $post_id = $posts->ID;
             $post_title = $posts->post_title;
