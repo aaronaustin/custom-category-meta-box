@@ -47,28 +47,37 @@
         $post_data = array(
             array('date' => $this_sunday_date)
         );
-        
-        $idx=1;
-        foreach( $sunday_posts as $posts) {
-            $post_id = $posts->ID;
-            $post_title = $posts->post_title;
-            $event_start_datetime = get_post_meta($posts->ID, 'event_start_datetime', true); 
-            $path_custom = get_post_meta($posts->ID, 'path_custom', true); 
+
+        if(count($sunday_posts) == 0){
             
             $post_item = array(
-                'ID' => $post_id,
-                'title' => $post_title,
-                'event_start_datetime' => $event_start_datetime,
-                'path_custom' => $path_custom
+                'ID' => 1,
+                'title' => 'No scheduled events',
+                'event_start_datetime' => $this_sunday_date,
+                'path_custom' => ''
             );
-            $post_data[$idx] = $post_item;
-            // $post_data[ 'wordpress_id' ] = 1;
-            // // $post_data[ 'wordpress_id' ] = $post_id;
-            // $post_data[ 'title' ] = $post_title;
-            // $post_data[ 'event_start_datetime' ] = $event_start_datetime;
-            // $post_data[ 'path_custom' ] = $path_custom;
-            $idx++;
+            $post_data[1] = $post_item;
         }
+        else {
+            $idx=1;
+            foreach( $sunday_posts as $posts) {
+                $post_id = $posts->ID;
+                $post_title = $posts->post_title;
+                $event_start_datetime = get_post_meta($posts->ID, 'event_start_datetime', true); 
+                $path_custom = get_post_meta($posts->ID, 'path_custom', true); 
+                
+                $post_item = array(
+                    'ID' => $post_id,
+                    'title' => $post_title,
+                    'event_start_datetime' => $event_start_datetime,
+                    'path_custom' => $path_custom
+                );
+                $post_data[$idx] = $post_item;
+
+                $idx++;
+            }
+        }
+        
         wp_reset_postdata();
                 
         return rest_ensure_response( $post_data );
