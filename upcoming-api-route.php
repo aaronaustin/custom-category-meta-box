@@ -54,7 +54,7 @@
                 'ID' => 1,
                 'title' => 'No scheduled events',
                 'event_start_datetime' => $this_sunday_date,
-                'path_custom' => ''
+                'path_custom' => 'noPath'
             );
             $post_data[1] = $post_item;
         }
