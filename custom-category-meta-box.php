@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.3.0
+Version: 1.4.0
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -516,6 +516,8 @@ function get_event_post_meta_for_api( $object ) {
 	$event_start_datetime = get_post_meta( $post_id, 'event_start_datetime', true );
 	$event_end_datetime = get_post_meta( $post_id, 'event_end_datetime', true );
 	$event_monthday = get_post_meta( $post_id, 'event_monthday', true );
+	$event_yearmonth = substr(get_post_meta( $post_id, 'event_start_datetime', true ), 0, 7);
+	$event_yearmonthday = substr(get_post_meta( $post_id, 'event_start_datetime', true ), 0, 10);
 	$event_location = get_post_meta( $post_id, 'event_location', true );
 	$event_address = get_post_meta( $post_id, 'event_address', true );
 	$event_city = get_post_meta( $post_id, 'event_city', true );
@@ -526,6 +528,8 @@ function get_event_post_meta_for_api( $object ) {
 		'event_start_datetime' => $event_start_datetime,
 		'event_end_datetime' => $event_end_datetime,
 		'event_monthday' => $event_monthday,
+		'event_yearmonth' => $event_yearmonth,
+		'event_yearmonthday' => $event_yearmonthday,
 		'event_location' => $event_location,
 		'event_address' => $event_address,
 		'event_city' => $event_city,
