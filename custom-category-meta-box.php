@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.4.0
+Version: 1.4.1
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -16,8 +16,8 @@ function custom_load_post() {
 	remove_meta_box( 'slidediv' , 'post' , 'side' );
     add_meta_box( 'slide_category_div' , __( 'Slide Type' ) , 'slide_category_metabox' , 'post' , 'normal', 'high', array( 'taxonomy' => 'category' ) );
 	
-	remove_meta_box( 'mediadiv' , 'post' , 'side' );
-    add_meta_box( 'media_category_div' , __( 'Media Type' ) , 'media_category_metabox' , 'post' , 'normal', 'high', array( 'taxonomy' => 'category' ) );
+	remove_meta_box( 'audiovisualdiv' , 'post' , 'side' );
+    add_meta_box( 'audiovisual_category_div' , __( 'Audiovisual Type' ) , 'audiovisual_category_metabox' , 'post' , 'normal', 'high', array( 'taxonomy' => 'category' ) );
 	
 }
 function custom_category_metabox( $post ) {
@@ -59,20 +59,20 @@ function custom_category_metabox( $post ) {
     <?php   
 }
 
-function media_category_metabox( $post ) {
+function audiovisual_category_metabox( $post ) {
     ?>
-        <div id="media-category" class="custom-taxonomy mediadiv">
-            <div id="media-category-all">
-                <input type="hidden" name="tax_input[media][]" value="0" />
-                <?php $args = array('taxonomy' => 'media', 'type' => $post->post_type , 'hide_empty' => false , 'parent' => 0 ); ?>
-                <?php $media_categories = get_terms( $args ); ?>
-                <?php if( !empty( $media_categories ) ) : ?>
-                    <ul id="mediachecklist" data-wp-lists="list:media" class="categorychecklist form-no-clear">
-                        <?php $selected_cats = wp_get_post_terms( $post->ID , 'media', array( 'fields' => 'ids' ) ); ?>
-                        <?php foreach( $media_categories as $category ) : ?>
-                            <li id="media-<?php echo $category->term_id; ?>">
+        <div id="audiovisual-category" class="custom-taxonomy audiovisualdiv">
+            <div id="audiovisual-category-all">
+                <input type="hidden" name="tax_input[audiovisual][]" value="0" />
+                <?php $args = array('taxonomy' => 'audiovisual', 'type' => $post->post_type , 'hide_empty' => false , 'parent' => 0 ); ?>
+                <?php $audiovisual_categories = get_terms( $args ); ?>
+                <?php if( !empty( $audiovisual_categories ) ) : ?>
+                    <ul id="audiovisualchecklist" data-wp-lists="list:audiovisual" class="categorychecklist form-no-clear">
+                        <?php $selected_cats = wp_get_post_terms( $post->ID , 'audiovisual', array( 'fields' => 'ids' ) ); ?>
+                        <?php foreach( $audiovisual_categories as $category ) : ?>
+                            <li id="audiovisual-<?php echo $category->term_id; ?>">
                                 <label class="selectit">
-                                    <input value="<?php echo $category->term_id; ?>" type="radio" name="tax_input[media][]" id="in-category-<?php echo $category->term_id; ?>" <?php checked( in_array( $category->term_id , $selected_cats ) , true ); ?> />
+                                    <input value="<?php echo $category->term_id; ?>" type="radio" name="tax_input[audiovisual][]" id="in-category-<?php echo $category->term_id; ?>" <?php checked( in_array( $category->term_id , $selected_cats ) , true ); ?> />
                                     <?php echo  esc_html( apply_filters( 'the_category' , $category->name ) ); ?>
                                 </label>
                                 <?php $child_args = array( 'type' => $post->post_type , 'hide_empty' => false , 'parent' => $category->term_id ); ?>
@@ -80,9 +80,9 @@ function media_category_metabox( $post ) {
                                 <?php if( !empty( $child_categories ) ) : ?>
                                     <ul class="children">
                                         <?php foreach( $child_categories as $child_category ) : ?>
-                                            <li id="media-<?php echo $child_category->term_id; ?>">
+                                            <li id="audiovisual-<?php echo $child_category->term_id; ?>">
                                                 <label class="selectit">
-                                                    <input value="<?php echo $child_category->term_id; ?>" type="radio" name="tax_input[media][]" id="in-category-<?php echo $child_category->term_id; ?>" <?php checked( in_array( $child_category->term_id , $selected_cats ) , true ); ?> />
+                                                    <input value="<?php echo $child_category->term_id; ?>" type="radio" name="tax_input[audiovisual][]" id="in-category-<?php echo $child_category->term_id; ?>" <?php checked( in_array( $child_category->term_id , $selected_cats ) , true ); ?> />
                                                     <?php echo  esc_html( apply_filters( 'the_category' , $child_category->name ) ); ?>
                                                 </label>
                                             </li>
@@ -148,20 +148,20 @@ function custom_category_assets() {
 }
 
 // Register Custom Taxonomy
-function media_taxonomy() {
+function audiovisual_taxonomy() {
 
 	$labels = array(
-		'name'                       => _x( 'Media', 'Taxonomy General Name', 'text_domain' ),
-		'singular_name'              => _x( 'Media', 'Taxonomy Singular Name', 'text_domain' ),
-		'menu_name'                  => __( 'Media', 'text_domain' ),
-		'all_items'                  => __( 'Media', 'text_domain' ),
+		'name'                       => _x( 'Audiovisual', 'Taxonomy General Name', 'text_domain' ),
+		'singular_name'              => _x( 'Audiovisual', 'Taxonomy Singular Name', 'text_domain' ),
+		'menu_name'                  => __( 'Audiovisual', 'text_domain' ),
+		'all_items'                  => __( 'Audiovisual', 'text_domain' ),
 		'parent_item'                => __( 'Parent Item', 'text_domain' ),
 		'parent_item_colon'          => __( 'Parent Item:', 'text_domain' ),
-		'new_item_name'              => __( 'New Media', 'text_domain' ),
-		'add_new_item'               => __( 'Add Media', 'text_domain' ),
-		'edit_item'                  => __( 'Edit Media', 'text_domain' ),
-		'update_item'                => __( 'Update Media', 'text_domain' ),
-		'view_item'                  => __( 'View Media', 'text_domain' ),
+		'new_item_name'              => __( 'New Audiovisual', 'text_domain' ),
+		'add_new_item'               => __( 'Add Audiovisual', 'text_domain' ),
+		'edit_item'                  => __( 'Edit Audiovisual', 'text_domain' ),
+		'update_item'                => __( 'Update Audiovisual', 'text_domain' ),
+		'view_item'                  => __( 'View Audiovisual', 'text_domain' ),
 		'separate_items_with_commas' => __( 'Separate items with commas', 'text_domain' ),
 		'add_or_remove_items'        => __( 'Add or remove items', 'text_domain' ),
 		'choose_from_most_used'      => __( 'Choose from the most used', 'text_domain' ),
@@ -173,7 +173,7 @@ function media_taxonomy() {
 		'items_list_navigation'      => __( 'Items list navigation', 'text_domain' ),
 	);
 	$rewrite = array(
-		'slug'                       => 'media',
+		'slug'                       => 'audiovisual',
 		'with_front'                 => false,
 		'hierarchical'               => false,
 	);
@@ -189,10 +189,10 @@ function media_taxonomy() {
 		'rewrite'                    => $rewrite,
 		'show_in_rest'               => true,
 	);
-	register_taxonomy( 'media', array( 'post' ), $args );
+	register_taxonomy( 'audiovisual', array( 'post' ), $args );
 
 }
-add_action( 'init', 'media_taxonomy', 0 );
+add_action( 'init', 'audiovisual_taxonomy', 0 );
 
 // Register Custom Taxonomy
 function slide_taxonomy() {
@@ -759,7 +759,7 @@ add_action( 'after_setup_theme', 'remove_add_image_sizes' );
 function remove_post_excerpt_checkbox() {
   ?>
     <style>
-      .metabox-prefs label[for="media_category_div-hide"], 
+      .metabox-prefs label[for="audiovisual_category_div-hide"], 
 	  .metabox-prefs label[for="slide_category_div-hide"], 
 	  .metabox-prefs label[for="displaydiv-hide"], 
 	  .metabox-prefs label[for="commentsdiv-hide"], 
