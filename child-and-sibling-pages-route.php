@@ -28,7 +28,7 @@ function get_child_and_sibling_pages( $object ) {
     );
     $child_pages = get_children( $child_args );
 
-    $child_page_data = array();
+    $child_page_data;
 
     foreach( $child_pages as $posts) {
         $post_id = $posts->ID;
@@ -53,7 +53,7 @@ function get_child_and_sibling_pages( $object ) {
     );
     $sibling_pages = get_children( $sibling_args );
     
-    $sibling_page_data = array();
+    $sibling_page_data;
 
     foreach( $sibling_pages as $posts) {
         $post_id = $posts->ID;
