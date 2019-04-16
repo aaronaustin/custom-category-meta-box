@@ -19,7 +19,6 @@ function get_child_and_sibling_pages( $object ) {
     $post_id = $object['id'];
     $post_parent = wp_get_post_parent_id( $object['id'] );
 	//return the post meta
-    $path_custom = get_post_meta( $post_id, 'path_custom', true );
     
     $child_args = array(
         'post_parent' => $post_id,
@@ -29,6 +28,23 @@ function get_child_and_sibling_pages( $object ) {
     );
     $child_pages = get_children( $child_args );
 
+    $child_page_data = array();
+
+    foreach( $child_pages as $posts) {
+        $post_id = $posts->ID;
+        $post_title = $posts->post_title;
+        $slug = $posts->post_name;
+
+        $post_item = array(
+            'ID' => $post_id,
+            'title' => $post_title,
+            'slug' => $slug
+        );
+        $child_page_data[$idx] = $post_item;
+
+        $idx++;
+    }
+
     $sibling_args = array(
         'post_parent' => $post_parent,
         'post_type'   => 'page', 
@@ -36,12 +52,29 @@ function get_child_and_sibling_pages( $object ) {
         'post_status' => 'publish' 
     );
     $sibling_pages = get_children( $sibling_args );
-	
+    
+    $sibling_page_data = array();
+
+    foreach( $sibling_pages as $posts) {
+        $post_id = $posts->ID;
+        $post_title = $posts->post_title;
+        $slug = $posts->post_name;
+
+        $post_item = array(
+            'ID' => $post_id,
+            'title' => $post_title,
+            'slug' => $slug
+        );
+        $sibling_page_data[$idx] = $post_item;
+
+        $idx++;
+    }
+
 	$child_and_sibling_pages = array(
-		'child_pages' => $child_pages,
-		'sibling_pages' => $sibling_pages
-	);
-	// var_dump($path_post_meta);
+		'child_pages' => $child_page_data,
+		'sibling_pages' => $sibling_page_data
+    );
+    
     return $child_and_sibling_pages;
 }
 
