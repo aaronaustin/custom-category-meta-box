@@ -42,7 +42,7 @@ function get_child_and_sibling_pages( $object ) {
 		'sibling_pages' => $sibling_pages
 	);
 	// var_dump($path_post_meta);
-    return $path_post_meta;
+    return $child_and_sibling_pages;
 }
 
 
