@@ -28,8 +28,8 @@ function get_child_and_sibling_pages( $object ) {
     );
     $child_pages = get_children( $child_args );
 
-    $child_page_data;
-
+    $child_page_data = array();
+    $child_idx=0;
     foreach( $child_pages as $posts) {
         $post_id = $posts->ID;
         $post_title = $posts->post_title;
@@ -40,9 +40,9 @@ function get_child_and_sibling_pages( $object ) {
             'title' => $post_title,
             'slug' => $slug
         );
-        $child_page_data[$idx] = $post_item;
+        $child_page_data[$child_idx] = $post_item;
 
-        $idx++;
+        $child_idx++;
     }
 
     $sibling_args = array(
@@ -53,8 +53,8 @@ function get_child_and_sibling_pages( $object ) {
     );
     $sibling_pages = get_children( $sibling_args );
     
-    $sibling_page_data;
-
+    $sibling_page_data = array();
+    $sibling_idx=0;
     foreach( $sibling_pages as $posts) {
         $post_id = $posts->ID;
         $post_title = $posts->post_title;
@@ -65,9 +65,9 @@ function get_child_and_sibling_pages( $object ) {
             'title' => $post_title,
             'slug' => $slug
         );
-        $sibling_page_data[$idx] = $post_item;
+        $sibling_page_data[$sibling_idx] = $post_item;
 
-        $idx++;
+        $sibling_idx++;
     }
 
 	$child_and_sibling_pages = array(
