@@ -7,7 +7,7 @@ add_action( 'rest_api_init', 'child_pages_api_posts_meta_field' );
 
 function child_pages_api_posts_meta_field() {
     // register_rest_field ( 'name-of-post-type', 'name-of-field-to-return', array-of-callbacks-and-schema() );
-    register_rest_field( 'post', 'related_pages', array(
+    register_rest_field( 'page', 'related_pages', array(
            'get_callback'    => 'get_child_and_sibling_pages',
            'schema'          => null,
         )
