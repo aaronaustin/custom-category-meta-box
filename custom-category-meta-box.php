@@ -1,7 +1,7 @@
 <?php
 /*Plugin Name: Add Custom Category Meta Box to Posts
 Description: This plugin adds a custom meta box in place of the standard category meta box for posts.
-Version: 1.4.1
+Version: 1.4.2
 License: GPLv2
 GitHub Plugin URI: https://github.com/aaronaustin/custom-category-meta-box
 */
@@ -193,6 +193,8 @@ function audiovisual_taxonomy() {
 
 }
 add_action( 'init', 'audiovisual_taxonomy', 0 );
+
+
 
 // Register Custom Taxonomy
 function slide_taxonomy() {
@@ -779,5 +781,10 @@ function remove_post_excerpt_checkbox() {
 add_action( 'admin_head', 'remove_post_excerpt_checkbox' );
 
 
+
+
 include 'upcoming-api-route.php';
+
+include 'child-and-sibling-pages-route.php';
+
 ?>
