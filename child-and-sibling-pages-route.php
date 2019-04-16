@@ -51,7 +51,7 @@ function get_child_and_sibling_pages( $object ) {
         'numberposts' => -1,
         'post_status' => 'publish' 
     );
-    $sibling_pages = get_children( $sibling_args );
+    $sibling_pages = $post_parent != 0 ? get_children( $sibling_args ) : array();
     
     $sibling_page_data = array();
     $sibling_idx=0;
